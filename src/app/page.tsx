@@ -95,10 +95,10 @@ const Navbar = ({ onLinkClick, activeSection }: { onLinkClick: (id: string) => v
 const ImageSlideshow = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const images = [
-    "/images/IMG_0160.jpeg",
-    "/images/IMG_0165.jpeg",
-    "/images/Session0_Slide1.png",
-    "/images/word_media_image1.png",
+    "/images/BEM03815.jpg",
+    "/images/BEM03816.jpg",
+    "/images/FE%20Sesi%20%231%20SS1.png",
+    "/images/session4.png",
   ];
 
   const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % images.length);
@@ -110,9 +110,9 @@ const ImageSlideshow = () => {
   }, []);
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto h-56 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-2xl bg-gray-900">
+    <div className="relative w-full max-w-4xl mx-auto aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl bg-gray-900">
       {images.map((src, index) => (
-        <img key={src} src={src} alt={`Slideshow image ${index + 1}`} className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${index === currentIndex ? 'opacity-100' : 'opacity-0'}`} />
+        <img key={src} src={src} alt={`Slideshow image ${index + 1}`} className={`absolute inset-0 w-full h-full object-cover bg-black transition-opacity duration-1000 ease-in-out ${index === currentIndex ? 'opacity-100' : 'opacity-0'}`} />
       ))}
        <div className="absolute inset-0 bg-black/30"></div>
       <button onClick={prevSlide} className="absolute top-1/2 left-4 -translate-y-1/2 bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors focus:outline-none"><ChevronLeft className="h-6 w-6 text-white"/></button>
@@ -134,8 +134,8 @@ const Footer = () => {
                 <div className="mb-8">
                     <h3 className="text-lg font-semibold text-white">Have any questions?</h3>
                     <p className="mt-2 text-gray-400">Contact our recruitment admin:</p>
-                    <p className="mt-2 text-lg font-medium text-[#00a9e0]">Stanley Pratama Teguh</p>
-                    <p className="text-gray-300">+62 895-6378-76392</p>
+                    <p className="mt-2 text-lg font-medium text-[#00a9e0]">Darren Gavriel Suntara</p>
+                    <p className="text-gray-300">+62 812-3850-6716</p>
                 </div>
                 <div className="flex justify-center space-x-6 mb-8">
                     {socialLinks.map(link => (
@@ -285,41 +285,12 @@ const Timeline = ({ events }: { events: any[] }) => {
 
 // --- Main App Component ---
 export default function App() {
-  const [formData, setFormData] = useState({ fullName: '', nim: '', major: '', lntClass: 'UI/UX Design', position: 'UI/UX Design', binusianEmail: '', privateEmail: '' });
-  const [resume, setResume] = useState<File | null>(null);
-  const [resumeName, setResumeName] = useState('');
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
-
-  // App State
-  type Status = 'idle' | 'loading' | 'success' | 'error';
-  const [status, setStatus] = useState<Status>('idle');
-  const [message, setMessage] = useState('');
-  const [showThankYou, setShowThankYou] = useState(false);
   const [activeSection, setActiveSection] = useState('');
-  
-  const [isRecruitmentOpen, setIsRecruitmentOpen] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    // This new effect fetches the live status from our API.
-    const fetchStatus = async () => {
-        try {
-            const response = await fetch('/api/recruitment-status');
-            if (!response.ok) throw new Error(); // Simple error trigger
-            const data = await response.json();
-            setIsRecruitmentOpen(data.isRecruitmentOpen);
-        } catch (error) {
-            // If the API fails for any reason, default to closed for safety.
-            setIsRecruitmentOpen(false);
-        }
-    };
-    fetchStatus();
-  }, []); // Runs once when the component loads
 
 
   useEffect(() => {
     // This effect now only handles UI setup like title and scroll observers.
-    document.title = "BNCC LnT - Open Recruitment";
+    document.title = "BNCC LnT - Open Recruitment Praetorian 38";
     let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
     if (!link) {
       link = document.createElement('link');
@@ -343,122 +314,6 @@ export default function App() {
     return () => sections.forEach(section => observer.unobserve(section));
   }, []);
 
-  const allowedFileTypes = [
-    'application/pdf',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'image/jpeg',
-    'image/png',
-    'application/zip',
-    'application/x-zip-compressed',
-    'application/x-7z-compressed',
-  ];
-
-  const fileTypeExtensions = ".pdf, .doc, .docx, .jpg, .jpeg, .png, .zip, .7z";
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      
-      if (!allowedFileTypes.includes(file.type)) {
-        setStatus('error');
-        setMessage('Invalid file type. Please upload one of the supported formats.');
-        setResume(null);
-        setResumeName('');
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) { 
-        setStatus('error'); 
-        setMessage('File size cannot exceed 5MB.'); 
-        setResume(null); 
-        setResumeName(''); 
-        return; 
-      }
-
-      setResume(file);
-      setResumeName(file.name);
-      if (status === 'error') { 
-        setStatus('idle'); 
-        setMessage(''); 
-      }
-    }
-  };
-  
-
-  const handleInitialSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!isRecruitmentOpen) {
-        setStatus('error');
-        setMessage('Sorry, the recruitment period has ended.');
-        return;
-    }
-
-    if (!/^\d+$/.test(formData.nim)) {
-        setStatus('error');
-        setMessage('NIM must only contain numbers.');
-        return;
-    }
-
-    if (!formData.binusianEmail.endsWith('@binus.ac.id')) {
-        setStatus('error');
-        setMessage('Please use a valid Binusian email (@binus.ac.id).');
-        return;
-    }
-
-    if (!resume) {
-        setStatus('error');
-        setMessage('Please upload your resume.');
-        return;
-    }
-
-    setShowConfirmModal(true); 
-  };
-
-
-  const handleSubmit = async () => {
-    setStatus('loading');
-    setMessage('Submitting your application...');
-    
-    const formPayload = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-        formPayload.append(key, value);
-    });
-    if (resume) {
-        formPayload.append('resume', resume); 
-    }
-
-    try {
-        const response = await fetch('/api/submit', {
-            method: 'POST',
-            body: formPayload,
-        });
-
-        if (response.ok) {
-            setStatus('success');
-            setMessage('Submission successful! Redirecting...');
-            setTimeout(() => {
-                setShowThankYou(true);
-            }, 1000);
-        } else {
-            const errorData = await response.json();
-            setStatus('error');
-            setMessage(errorData.error || 'An unknown server error occurred.');
-            console.error('Server responded with an error:', errorData);
-        }
-    } catch (error) {
-        setStatus('error');
-        setMessage('A network error occurred. Please check your connection and try again.');
-        console.error('Fetch API call failed:', error);
-    }
-  };
-
-  
   const positions = ["UI/UX Design", "Back-end Development", "Java Programming", "Front-end Development", "C Programming"];
   const qualifications = ["Binusian", "Member or activist or Alumni BNCC", "Able to work in a team and individually", "Public speaking and teaching skills is a plus"];
   const benefits = [
@@ -470,35 +325,22 @@ export default function App() {
   ];
 
   const timelineEvents = [
-    { icon: CalendarDays, title: "Open Recruitment", date: "14 July - 4 August", description: "Submit your application to become part of the team." },
-    { icon: UserCheck, title: "Interview & Simulation", date: "7 August - 16 August", description: "Showcase your skills and passion in interviews and a teaching simulation." },
+    { icon: CalendarDays, title: "Open Recruitment", date: "6 July - 7 August", description: "Submit your application to become part of the team." },
+    { icon: UserCheck, title: "Interview & Simulation", date: "10 - 16 August", description: "Showcase your skills and passion in interviews and a teaching simulation." },
     { icon: Megaphone, title: "Announcement", date: "20 August", description: "Successful candidates will be announced." },
-    { icon: Swords, title: "Training Begins", date: "22 August onwards", description: "Get ready for the new LnT Class Season with comprehensive training." },
+    { icon: Swords, title: "Training Begins", date: "24 August onwards", description: "Get ready for the new LnT Class Season with comprehensive training." },
   ];
 
-  const getButtonContent = () => {
-    switch (status) {
-      case 'loading': return <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Submitting...</>;
-      case 'success': return <><CheckCircle2 className="mr-2 h-5 w-5" /> Submitted!</>;
-      case 'error': return <><ServerCrash className="mr-2 h-5 w-5" /> Try Again</>;
-      default: return <><Send className="mr-2 h-5 w-5" /> Submit Application</>;
-    }
-  };
-
-  if (showThankYou) {
-    return <ThankYouPage onBack={() => setShowThankYou(false)} />;
-  }
-  
   return (
     <div className="bg-[#0d1a2e] min-h-screen text-white antialiased">
       <Navbar onLinkClick={scrollTo} activeSection={activeSection} />
       
       <header className="relative w-full h-screen">
-        <div className="absolute inset-0 bg-black"><img src="/images/IMG_0168.jpeg" alt="Team members working together" className="w-full h-full object-cover object-top opacity-50" /></div>
+        <div className="absolute inset-0 bg-black"><img src="/images/BEM03815.jpg" alt="Team members working together" className="w-full h-full object-cover object-top opacity-50" /></div>
         <div className="absolute inset-0 bg-gradient-to-t from-[#0d1a2e] via-[#0d1a2e]/80 to-transparent"></div>
         <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
             <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white drop-shadow-lg animate-fade-in-up">Open Recruitment</h1>
-            <p className="mt-4 text-2xl md:text-3xl font-semibold text-[#00a9e0] animate-fade-in-up animation-delay-300">Praetorian LnT 37</p>
+            <p className="mt-4 text-2xl md:text-3xl font-semibold text-[#00a9e0] animate-fade-in-up animation-delay-300">Praetorian LnT 38</p>
         </div>
       </header>
 
@@ -537,7 +379,7 @@ export default function App() {
           <SectionSeparator />
 
           <div className="py-16 md:py-24 space-y-24">
-             <AnimatedSection id="poster"><h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Join The Praetorians</h2><div className="max-w-md mx-auto bg-gray-900 p-4 rounded-2xl shadow-2xl"><img src="/images/Praetorian Recruitment.png" alt="Praetorian LnT 37 Recruitment Poster" className="rounded-lg w-full"/></div></AnimatedSection>
+             <AnimatedSection id="poster"><h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Join The Praetorians</h2><div className="max-w-md mx-auto bg-gray-900 p-4 rounded-2xl shadow-2xl"><img src="/images/perekrutan praeto BNCC.png" alt="Praetorian LnT 37 Recruitment Poster" className="rounded-lg w-full"/></div></AnimatedSection>
              <AnimatedSection id="gallery"><h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Life at LnT BNCC</h2><ImageSlideshow /></AnimatedSection>
           </div>
 
@@ -560,88 +402,21 @@ export default function App() {
                   </div>
                   <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/50 p-8 rounded-2xl shadow-2xl">
                     <h2 className="text-2xl font-bold text-white mb-6 text-center">APPLICATION FORM</h2>
-                    
-                    {isRecruitmentOpen === null ? (
-                        <div className="text-center py-10">
-                            <Loader2 className="h-16 w-16 mx-auto text-gray-500 mb-4 animate-spin" />
-                            <h3 className="text-2xl font-bold text-white">Loading Recruitment Status...</h3>
-                        </div>
-                    ) : isRecruitmentOpen ? (
-                        <form ref={formRef} onSubmit={handleInitialSubmit} className="space-y-4">
-                        {showConfirmModal && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-300">
-                            <div className="bg-[#0d1a2e] border border-gray-700 rounded-xl shadow-2xl max-w-lg w-full p-6 transform scale-95 opacity-0 animate-fadeScaleIn">
-                            <h2 className="text-2xl font-bold text-white mb-4 text-center">Confirm Your Data</h2>
-                            <div className="text-gray-300 space-y-2 text-sm">
-                                <p><strong>Full Name:</strong> {formData.fullName}</p>
-                                <p><strong>NIM:</strong> {formData.nim}</p>
-                                <p><strong>Major:</strong> {formData.major}</p>
-                                <p><strong>LnT Class:</strong> {formData.lntClass}</p>
-                                <p><strong>Position:</strong> {formData.position}</p>
-                                <p><strong>Binusian Email:</strong> {formData.binusianEmail}</p>
-                                <p><strong>Private Email:</strong> {formData.privateEmail}</p>
-                                <p><strong>CV Filename:</strong> {resumeName}</p>
-                            </div>
-                            <p className="mt-4 text-sm text-yellow-400">
-                                Please make sure all information is correct before submitting.
-                            </p>
-                            <div className="mt-6 flex justify-end space-x-3">
-                                <button
-                                onClick={() => setShowConfirmModal(false)}
-                                className="px-4 py-2 text-sm text-white bg-gray-600 rounded hover:bg-gray-500 transition"
-                                >
-                                Cancel
-                                </button>
-                                <button
-                                onClick={() => {
-                                    setShowConfirmModal(false);
-                                    handleSubmit();
-                                }}
-                                className="px-4 py-2 text-sm text-white bg-[#00a9e0] rounded hover:bg-sky-500 transition"
-                                >
-                                Confirm & Submit
-                                </button>
-                            </div>
-                            </div>
-                        </div>
-                        )}
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div><label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-1">Full Name</label><input type="text" name="fullName" id="fullName" required value={formData.fullName} onChange={handleInputChange} className="w-full bg-gray-700/50 border border-gray-600 rounded-md py-2 px-3 focus:ring-[#00a9e0] focus:border-[#00a9e0]"/></div>
-                            <div><label htmlFor="nim" className="block text-sm font-medium text-gray-300 mb-1">NIM</label><input type="text" name="nim" id="nim" required value={formData.nim} onChange={handleInputChange} className="w-full bg-gray-700/50 border border-gray-600 rounded-md py-2 px-3 focus:ring-[#00a9e0] focus:border-[#00a9e0]"/></div>
-                        </div>
-                        <div><label htmlFor="major" className="block text-sm font-medium text-gray-300 mb-1">Major</label><input type="text" name="major" id="major" required value={formData.major} onChange={handleInputChange} className="w-full bg-gray-700/50 border border-gray-600 rounded-md py-2 px-3 focus:ring-[#00a9e0] focus:border-[#00a9e0]"/></div>
-                        <div><label htmlFor="lntClass" className="block text-sm font-medium text-gray-300 mb-1">LnT Class Right Now</label><select id="lntClass" name="lntClass" required value={formData.lntClass} onChange={handleInputChange} className="w-full bg-gray-700/50 border border-gray-600 rounded-md py-2 px-3 focus:ring-[#00a9e0] focus:border-[#00a9e0]">{positions.map(p => <option key={p}>{p}</option>)}</select></div>
-                        <div><label htmlFor="position" className="block text-sm font-medium text-gray-300 mb-1">Position Applying For</label><select id="position" name="position" required value={formData.position} onChange={handleInputChange} className="w-full bg-gray-700/50 border border-gray-600 rounded-md py-2 px-3 focus:ring-[#00a9e0] focus:border-[#00a9e0]">{positions.map(p => <option key={p}>{p}</option>)}</select></div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div><label htmlFor="binusianEmail" className="block text-sm font-medium text-gray-300 mb-1">Binusian Email</label><input type="email" name="binusianEmail" id="binusianEmail" required value={formData.binusianEmail} onChange={handleInputChange} className="w-full bg-gray-700/50 border border-gray-600 rounded-md py-2 px-3 focus:ring-[#00a9e0] focus:border-[#00a9e0]"/></div>
-                            <div><label htmlFor="privateEmail" className="block text-sm font-medium text-gray-300 mb-1">Private Email</label><input type="email" name="privateEmail" id="privateEmail" required value={formData.privateEmail} onChange={handleInputChange} className="w-full bg-gray-700/50 border border-gray-600 rounded-md py-2 px-3 focus:ring-[#00a9e0] focus:border-[#00a9e0]"/></div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">Upload CV</label>
-                            <label htmlFor="resume" className="relative cursor-pointer bg-gray-700/50 border-2 border-dashed border-gray-600 rounded-md flex justify-center items-center p-4 text-gray-400 hover:border-[#00a9e0] hover:text-white transition group">
-                            <UploadCloud className="h-8 w-8 mr-3 text-gray-500 group-hover:text-[#00a9e0] transition" />
-                            <span className="font-medium truncate max-w-xs">{resumeName || "Click to upload (Max 5MB)"}</span>
-                            <input id="resume" name="resume" type="file" required onChange={handleFileChange} className="sr-only" accept={fileTypeExtensions} />
-                            </label>
-                            <p className="text-xs text-gray-500 mt-2">Supported formats: PDF, DOC, DOCX, JPG, PNG, ZIP, 7z.</p>
-                            <a href="https://media.developeracademy.id/docs/NamaLengkap_CV_Academy.docx" target="_blank" rel="noopener noreferrer" className="text-xs text-sky-400 hover:underline mt-1 inline-block">Download CV Template</a>
-                        </div>
-                        <div>
-                            <button type="submit" disabled={status === 'loading'} className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-white bg-[#00a9e0] hover:bg-sky-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-sky-500 transition-all duration-300 transform hover:scale-105 disabled:opacity-70 disabled:scale-100 disabled:cursor-not-allowed">
-                                {getButtonContent()}
-                            </button>
-                        </div>
-                        {status === 'error' && (<p className="text-center text-sm font-medium text-red-400">{message}</p>)}
-                        </form>
-                    ) : (
-                        <div className="text-center py-10">
-                            <CalendarDays className="h-16 w-16 mx-auto text-gray-500 mb-4" />
-                            <h3 className="text-2xl font-bold text-white">Recruitment Has Closed</h3>
-                            <p className="text-gray-400 mt-2">Thank you for your interest. The application period for Praetorian LnT 37 has ended.</p>
-                            <p className="text-gray-400 mt-1">Please keep an eye out for future opportunities!</p>
-                        </div>
-                    )}
+                    <div className="space-y-6">
+                      <div className="mx-auto flex max-w-[280px] justify-center overflow-hidden rounded-2xl border border-gray-700/50 bg-gray-900/60 p-0">
+                        <img src="/images/ApplicationForm.jpeg" alt="Praetorian recruitment application form" className="h-auto w-full max-w-[280px] object-contain rounded-2xl" />
+                      </div>
+                      <div className="text-center">
+                        <a
+                          href="https://bncc.in/PraetorianRegis38"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center rounded-md bg-[#00a9e0] px-6 py-3 text-base font-semibold text-white transition hover:bg-sky-500"
+                        >
+                          Open Registration Form
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 </div>
             </div>

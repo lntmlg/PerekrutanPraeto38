@@ -2,10 +2,6 @@ import mongoose from 'mongoose';
 
 const MONGO_URI = process.env.MONGO_URI;
 
-if (!MONGO_URI) {
-  throw new Error('Please define the MONGO_URI environment variable inside .env.local');
-}
-
 let cached = (global as any).mongoose;
 
 if (!cached) {
@@ -13,6 +9,11 @@ if (!cached) {
 }
 
 async function dbConnect() {
+  if (!MONGO_URI) {
+    console.warn('MONGO_URI not set. Database features are disabled.');
+    return null;
+  }
+
   if (cached.conn) {
     return cached.conn;
   }
@@ -22,7 +23,7 @@ async function dbConnect() {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGO_URI!, opts).then((mongoose) => {
+    cached.promise = mongoose.connect(MONGO_URI, opts).then((mongoose) => {
       return mongoose;
     });
   }
